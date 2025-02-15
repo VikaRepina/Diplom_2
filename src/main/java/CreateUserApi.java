@@ -5,9 +5,8 @@ public class CreateUserApi {
     private final Gson gson = new Gson();
 
     public Response createUser (User user) {
-        String requestBody = gson.toJson(user);
         return  ApiBase.getRequestSpecification()
-                .body(requestBody)
+                .body(user)
                 .post("/api/auth/register");
     }
 

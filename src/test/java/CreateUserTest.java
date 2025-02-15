@@ -9,6 +9,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+
 public class CreateUserTest {
     private static final String name = "Usernameaa";
     private static final String email = "testaa-data@yandex.ru";
@@ -50,5 +52,7 @@ public class CreateUserTest {
 
         Response responseSecond = createUserApi.createUser(user);
         responseSecond.then().statusCode(403);
+        responseSecond.then().body("success", equalTo(false));
+        responseSecond.then().body("message", equalTo("User already exists"));
     }
 }

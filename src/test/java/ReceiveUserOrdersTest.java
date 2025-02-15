@@ -12,9 +12,7 @@ public class ReceiveUserOrdersTest {
     private static final String name = "Usernameaa";
     private static final String email = "testaa-data@yandex.ru";
     private static final String password = "passwordaa";
-    private static final String ingredients1 = "61c0c5a71d1f82001bdaaa6d";
-    private static final String ingredients2 = "61c0c5a71d1f82001bdaaa6f";
-    private static final String ingredients3 = "61c0c5a71d1f82001bdaaa70";
+    private static final String ingredients = "61c0c5a71d1f82001bdaaa6d";
     private String Token;
     private String refreshToken;
     private final Gson gson = new Gson();
@@ -42,7 +40,8 @@ public class ReceiveUserOrdersTest {
         Token = responseSecond.jsonPath().get("accessToken");
 
         OrderApi orderApi = new OrderApi();
-        Response responseThird = orderApi.createOrder(ingredients1, ingredients2, ingredients3, Token);
+        Order order = new Order(ingredients);
+        Response responseThird = orderApi.createOrder(order, Token);
         Response responseFourth = orderApi.receiveUserOrders(Token);
         responseFourth.then().statusCode(200);
         responseFourth.then().body("success", equalTo(true));
@@ -63,7 +62,8 @@ public class ReceiveUserOrdersTest {
         Response responseSecond = changeInformationUser.leavingSystem(refreshToken);
 
         OrderApi orderApi = new OrderApi();
-        Response responseThird = orderApi.createOrder(ingredients1, ingredients2, ingredients3, Token);
+        Order order = new Order(ingredients);
+        Response responseThird = orderApi.createOrder(order, Token);
         Response responseFourth = orderApi.receiveUserOrdersNoAuthorization();
         responseFourth.then().statusCode(401);
         responseFourth.then().body("success", equalTo(false));

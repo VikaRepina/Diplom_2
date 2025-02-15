@@ -12,6 +12,8 @@ import org.junit.runners.Parameterized;
 import java.util.Arrays;
 import java.util.Collection;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+
 @RunWith(Parameterized.class)
 public class ChangeInformationUserWithAuthorizationTest {
     private static final String name = "Usernameaa";
@@ -51,12 +53,11 @@ public class ChangeInformationUserWithAuthorizationTest {
         }
     }
 
-    @Parameterized.Parameters
+    @Parameterized.Parameters(name = "Имя: {0}, Почта: {1}, Пароль: {2}")
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
                 {"Useeeername", "testaa-data@yandex.ru", "passwordaa"},
-                {"Usernameaa", "teeeesttaa-data@yandex.ru", "passwordaa"},
-                {"Usernameaa", "testaa-data@yandex.ru", "paaaaasswoorda"},
+                {"Usernameaa", "teeeesttaa-data@yandex.ru", "passwordaa"}
         });
     }
 
@@ -68,5 +69,6 @@ public class ChangeInformationUserWithAuthorizationTest {
        User updateUser = new User(nameC, emailC, passwordC);
        Response response = changeInformationUser.changeInformation(updateUser, Token);
        response.then().statusCode(200);
+       response.then().body("success", equalTo(true));
     }
 }

@@ -12,6 +12,8 @@ import org.junit.runners.Parameterized;
 import java.util.Arrays;
 import java.util.Collection;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+
 @RunWith(Parameterized.class)
 public class ChangeInformationUserNoAuthorizationeTest {
     private static final String name = "Usernameaa";
@@ -54,7 +56,7 @@ public class ChangeInformationUserNoAuthorizationeTest {
         }
     }
 
-    @Parameterized.Parameters
+    @Parameterized.Parameters(name = "Имя: {0}, Почта: {1}, Пароль: {2}")
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
                 {"Useeeername", "testaa-data@yandex.ru", "passwordaa"},
@@ -71,5 +73,7 @@ public class ChangeInformationUserNoAuthorizationeTest {
         User updateUser = new User(nameC, emailC, passwordC);
         Response response = changeInformationUser.changeInformationNoAuthorization(updateUser);
         response.then().statusCode(401);
+        response.then().body("success", equalTo(false));
+        response.then().body("message", equalTo("You should be authorised"));
     }
 }

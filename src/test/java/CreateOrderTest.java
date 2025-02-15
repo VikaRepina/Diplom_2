@@ -6,15 +6,14 @@ import io.restassured.response.Response;
 import org.junit.After;
 import org.junit.Test;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 
 public class CreateOrderTest {
     private static final String name = "Usernameaa";
     private static final String email = "testaa-data@yandex.ru";
     private static final String password = "passwordaa";
-    private static final String ingredients1 = "61c0c5a71d1f82001bdaaa6d";
-    private static final String ingredients2 = "61c0c5a71d1f82001bdaaa6f";
-    private static final String ingredients3 = "61c0c5a71d1f82001bdaaa70";
+    private static final String ingredients = "61c0c5a71d1f82001bdaaa6d";
     private String Token;
     private String refreshToken;
     private final Gson gson = new Gson();
@@ -42,8 +41,10 @@ public class CreateOrderTest {
         Token = responseSecond.jsonPath().get("accessToken");
 
         OrderApi orderApi = new OrderApi();
-        Response responseThird = orderApi.createOrder(ingredients1, ingredients2, ingredients3, Token);
+        Order order = new Order(ingredients);
+        Response responseThird = orderApi.createOrder(order, Token);
         responseThird.then().statusCode(200);
+        responseThird.then().body("success", equalTo(true));
     }
 
     @Test
@@ -57,7 +58,9 @@ public class CreateOrderTest {
 
 
         OrderApi orderApi = new OrderApi();
-        Response responseThird = orderApi.createOrderNoAuthorization(ingredients1, ingredients2, ingredients3);
+        Order order = new Order(ingredients);
+        Response responseThird = orderApi.createOrderNoAuthorization(order);
+        responseThird.then().statusCode(401);
         responseThird.then().body("success", equalTo(false));
     }
 
@@ -74,8 +77,11 @@ public class CreateOrderTest {
         Token = responseSecond.jsonPath().get("accessToken");
 
         OrderApi orderApi = new OrderApi();
-        Response responseThird = orderApi.createOrderWithoutIngredients(Token);
+        Order order = new Order(null);
+        Response responseThird = orderApi.createOrderWithoutIngredients(order, Token);
         responseThird.then().statusCode(400);
+        responseThird.then().body("success", equalTo(false));
+        responseThird.then().body("message", equalTo("Ingredient ids must be provided"));
     }
 
     @Test
@@ -91,10 +97,9 @@ public class CreateOrderTest {
         Token = responseSecond.jsonPath().get("accessToken");
 
         OrderApi orderApi = new OrderApi();
-        String invalidIngredient1 = "61c0gtahrh508yhdohataaa40";
-        String invalidIngredient2 = "679a0c5a58d1f82001bdeda54";
-        String invalidIngredient3 = "61c0c577ogFjstrj9rjjaaa94";
-        Response responseThird = orderApi.createOrder(invalidIngredient1, invalidIngredient2, invalidIngredient3, Token);
-        responseThird.then().statusCode(500);
+        String invalidIngredient = "61c0gtahrh508yhdohataaa40";
+        Order invalidOrder = new Order(invalidIngredient);
+        Response responseThird = orderApi.createOrder(invalidOrder, Token);
+        responseThird.then().statusCode(500).body(containsString("Internal Server Error"));
     }
 }

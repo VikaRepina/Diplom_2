@@ -5,9 +5,8 @@ public class LoginApi {
     private final Gson gson = new Gson();
 
     public Response authorizationWithExistingLogin(User user) {
-        String requestBody = gson.toJson(user);
         return  ApiBase.getRequestSpecification()
-                .body(requestBody)
+                .body(user)
                 .post("/api/auth/login");
     }
 }

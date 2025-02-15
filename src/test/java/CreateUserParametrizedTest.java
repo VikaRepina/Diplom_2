@@ -14,6 +14,8 @@ import org.junit.runners.Parameterized;
 import java.util.Arrays;
 import java.util.Collection;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+
 @RunWith(Parameterized.class)
 public class CreateUserParametrizedTest {
     private String email;
@@ -28,7 +30,7 @@ public class CreateUserParametrizedTest {
     }
 
 
-    @Parameterized.Parameters
+    @Parameterized.Parameters(name = "Имя: {0}, Почта: {1}, Пароль: {2}")
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
                 {"", "testaa-data@yandex.ru", "passwordaa"},
@@ -45,6 +47,7 @@ public class CreateUserParametrizedTest {
         CreateUserApi createUserApi = new CreateUserApi();
         Response response = createUserApi.createUser(user);
         response.then().statusCode(403);
+        response.then().body("success", equalTo(false));
     }
 
 }

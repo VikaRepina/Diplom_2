@@ -4,26 +4,23 @@ import io.restassured.response.Response;
 public class OrderApi {
     private final Gson gson = new Gson();
 
-    public Response createOrder (String ingredients1, String ingredients2, String ingredients3, String Token) {
-        String requestBody = "{ \"ingredients\": [\"" + ingredients1 + "\", \"" + ingredients2 + "\", \"" + ingredients3 + "\"] }";
+    public Response createOrder (Order order, String Token) {
         return  ApiBase.getRequestSpecification()
                 .header("Authorization", Token)
-                .body(requestBody)
+                .body(order)
                 .post("/api/orders");
     }
 
-    public Response createOrderNoAuthorization (String ingredients1, String ingredients2, String ingredients3) {
-        String requestBody = "{ \"ingredients\": [\"" + ingredients1 + "\", \"" + ingredients2 + "\", \"" + ingredients3 + "\"] }";
+    public Response createOrderNoAuthorization (Order order) {
         return  ApiBase.getRequestSpecification()
-                .body(requestBody)
+                .body(order)
                 .post("/api/orders");
     }
 
-    public Response createOrderWithoutIngredients(String Token) {
-        String requestBody = "{ \"ingredients\": [] }";
+    public Response createOrderWithoutIngredients(Order order, String Token) {
         return  ApiBase.getRequestSpecification()
                 .header("Authorization", Token)
-                .body(requestBody)
+                .body(order)
                 .post("/api/orders");
     }
 

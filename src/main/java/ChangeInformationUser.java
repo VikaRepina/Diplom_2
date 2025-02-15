@@ -6,17 +6,15 @@ public class ChangeInformationUser {
     private final Gson gson = new Gson();
 
     public Response changeInformation (User updateUser, String Token) {
-        String requestBody = gson.toJson(updateUser);
         return  ApiBase.getRequestSpecification()
                 .header("Authorization", Token)
-                .body(requestBody)
+                .body(updateUser)
                 .patch("/api/auth/user");
     }
 
     public Response changeInformationNoAuthorization (User updateUser) {
-        String requestBody = gson.toJson(updateUser);
         return  ApiBase.getRequestSpecification()
-                .body(requestBody)
+                .body(updateUser)
                 .patch("/api/auth/user");
     }
 

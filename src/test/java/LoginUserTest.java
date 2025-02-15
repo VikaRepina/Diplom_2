@@ -6,6 +6,8 @@ import io.restassured.response.Response;
 import org.junit.After;
 import org.junit.Test;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+
 public class LoginUserTest {
     private static final String name = "Usernamea";
     private static final String email = "testaaaa-data@yandex.ru";
@@ -36,15 +38,28 @@ public class LoginUserTest {
         LoginApi loginApi = new LoginApi();
         Response responseSecond = loginApi.authorizationWithExistingLogin(user);
         responseSecond.then().statusCode(200);
+        responseSecond.then().body("success", equalTo(true));
     }
 
     @Test
-    @DisplayName("Test authorization with non-existent login")
-    @Description("Проверка авторизации с неверным логином и паролем")
-    public void testAuthorizationWithNonExistentLogin() {
-        User user = new User(name, emailN, passwordN);
+    @DisplayName("Test authorization with non-existent email")
+    @Description("Проверка авторизации с неверным логином")
+    public void testAuthorizationWithNonExistentEmail() {
+        User user = new User(name, emailN, password);
         LoginApi loginApi = new LoginApi();
         Response response = loginApi.authorizationWithExistingLogin(user);
         response.then().statusCode(401);
+        response.then().body("success", equalTo(false));
+    }
+
+    @Test
+    @DisplayName("Test authorization with non-existent password")
+    @Description("Проверка авторизации с неверным паролем")
+    public void testAuthorizationWithNonExistentPassword() {
+        User user = new User(name, email, passwordN);
+        LoginApi loginApi = new LoginApi();
+        Response response = loginApi.authorizationWithExistingLogin(user);
+        response.then().statusCode(401);
+        response.then().body("success", equalTo(false));
     }
 }
