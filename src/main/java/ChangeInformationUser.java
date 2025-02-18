@@ -19,9 +19,9 @@ public class ChangeInformationUser {
     }
 
     public Response leavingSystem(String refreshToken) {
-        String requestBody = "{ \"token\": \"" + refreshToken + "\" }";
+        LogoutRequest logoutRequest = new LogoutRequest(refreshToken);
         return  ApiBase.getRequestSpecification()
-                .body(requestBody)
+                .body(logoutRequest)
                 .post("/api/auth/logout");
     }
 }

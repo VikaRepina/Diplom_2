@@ -17,13 +17,6 @@ public class OrderApi {
                 .post("/api/orders");
     }
 
-    public Response createOrderWithoutIngredients(Order order, String Token) {
-        return  ApiBase.getRequestSpecification()
-                .header("Authorization", Token)
-                .body(order)
-                .post("/api/orders");
-    }
-
     public Response receiveUserOrders(String Token) {
         return  ApiBase.getRequestSpecification()
                 .header("Authorization", Token)

@@ -1,3 +1,4 @@
+import com.github.javafaker.Faker;
 import com.google.gson.Gson;
 import io.qameta.allure.Description;
 import io.qameta.allure.Step;
@@ -13,23 +14,26 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 
-@RunWith(Parameterized.class)
+
 public class ChangeInformationUserWithAuthorizationTest {
-    private static final String name = "Usernameaa";
-    private static final String email = "testaa-data@yandex.ru";
-    private static final String password = "passwordaa";
-    private String nameC;
-    private String emailC;
-    private String passwordC;
+    private String name;
+    private String email;
+    private String password;
+    private static final String nameC = "Useeeername";
+    private static final String emailC = "teeeesttaa-data@yandex.ru";
     private String Token;
     private final Gson gson = new Gson();
+    private static final Faker faker = new Faker();
 
-    public ChangeInformationUserWithAuthorizationTest (String nameC, String emailC, String passwordC) {
-        this.nameC = nameC;
-        this.emailC = emailC;
-        this.passwordC = passwordC;
+    {
+        Faker faker = new Faker();
+        name = faker.name().username();
+        email = faker.internet().emailAddress();
+        password = faker.internet().password();
     }
+
 
     @Before
     @Step("Создание пользователя и авторизация")
@@ -53,22 +57,32 @@ public class ChangeInformationUserWithAuthorizationTest {
         }
     }
 
-    @Parameterized.Parameters(name = "Имя: {0}, Почта: {1}, Пароль: {2}")
-    public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][]{
-                {"Useeeername", "testaa-data@yandex.ru", "passwordaa"},
-                {"Usernameaa", "teeeesttaa-data@yandex.ru", "passwordaa"}
-        });
+    @Test
+    @DisplayName("Test change information user with authorization")
+    @Description("Проверка на изменение данных авторизованного пользователя")
+    public void testChangeInformationNameUserWithAuthorization() {
+       ChangeInformationUser changeInformationUser = new ChangeInformationUser();
+       User updateUser = new User(nameC, email, password);
+       Response response = changeInformationUser.changeInformation(updateUser, Token);
+       response.then().statusCode(200);
+       response.then().body("success", equalTo(true));
+
+       response.then().body("user.name", equalTo("Useeeername"));
+
+
     }
 
     @Test
     @DisplayName("Test change information user with authorization")
     @Description("Проверка на изменение данных авторизованного пользователя")
-    public void testChangeInformationUserWithAuthorization() {
-       ChangeInformationUser changeInformationUser = new ChangeInformationUser();
-       User updateUser = new User(nameC, emailC, passwordC);
-       Response response = changeInformationUser.changeInformation(updateUser, Token);
-       response.then().statusCode(200);
-       response.then().body("success", equalTo(true));
+    public void testChangeInformationEmailUserWithAuthorization() {
+        ChangeInformationUser changeInformationUser = new ChangeInformationUser();
+        User updateUser = new User(name, emailC, password);
+        Response response = changeInformationUser.changeInformation(updateUser, Token);
+        response.then().statusCode(200);
+        response.then().body("success", equalTo(true));
+
+        response.then().body("user.email", equalTo("teeeesttaa-data@yandex.ru"));
+
     }
 }

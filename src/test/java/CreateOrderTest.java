@@ -1,3 +1,4 @@
+import com.github.javafaker.Faker;
 import com.google.gson.Gson;
 import io.qameta.allure.Description;
 import io.qameta.allure.Step;
@@ -10,13 +11,21 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 
 public class CreateOrderTest {
-    private static final String name = "Usernameaa";
-    private static final String email = "testaa-data@yandex.ru";
-    private static final String password = "passwordaa";
+    private static String name;
+    private static String email;
+    private static String password;
     private static final String ingredients = "61c0c5a71d1f82001bdaaa6d";
     private String Token;
     private String refreshToken;
     private final Gson gson = new Gson();
+    private static final Faker faker = new Faker();
+
+    static {
+        Faker faker = new Faker();
+        name = faker.name().username();
+        email = faker.internet().emailAddress();
+        password = faker.internet().password();
+    }
 
     @After
     @Step("Удаление созданного пользователя")
@@ -62,6 +71,7 @@ public class CreateOrderTest {
         Response responseThird = orderApi.createOrderNoAuthorization(order);
         responseThird.then().statusCode(401);
         responseThird.then().body("success", equalTo(false));
+        response.then().body("message", equalTo("You should be authorised"));
     }
 
     @Test
@@ -78,7 +88,7 @@ public class CreateOrderTest {
 
         OrderApi orderApi = new OrderApi();
         Order order = new Order(null);
-        Response responseThird = orderApi.createOrderWithoutIngredients(order, Token);
+        Response responseThird = orderApi.createOrder(order, Token);
         responseThird.then().statusCode(400);
         responseThird.then().body("success", equalTo(false));
         responseThird.then().body("message", equalTo("Ingredient ids must be provided"));

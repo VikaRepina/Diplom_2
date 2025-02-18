@@ -1,3 +1,4 @@
+import com.github.javafaker.Faker;
 import com.google.gson.Gson;
 import io.qameta.allure.Description;
 import io.qameta.allure.Step;
@@ -12,11 +13,19 @@ import org.junit.Test;
 import static org.hamcrest.CoreMatchers.equalTo;
 
 public class CreateUserTest {
-    private static final String name = "Usernameaa";
-    private static final String email = "testaa-data@yandex.ru";
-    private static final String password = "passwordaa";
+    private static String name;
+    private static String email;
+    private static String password;
     private String Token;
     private final Gson gson = new Gson();
+    private static final Faker faker = new Faker();
+
+    static {
+        Faker faker = new Faker();
+        name = faker.name().username();
+        email = faker.internet().emailAddress();
+        password = faker.internet().password();
+    }
 
 
     @After

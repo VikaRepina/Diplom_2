@@ -1,3 +1,4 @@
+import com.github.javafaker.Faker;
 import com.google.gson.Gson;
 import io.qameta.allure.Description;
 import io.qameta.allure.Step;
@@ -11,20 +12,31 @@ import org.junit.runners.Parameterized;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
+import java.util.ArrayList;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 
 @RunWith(Parameterized.class)
 public class ChangeInformationUserNoAuthorizationeTest {
-    private static final String name = "Usernameaa";
-    private static final String email = "testaa-data@yandex.ru";
-    private static final String password = "passwordaa";
+    private static String name;
+    private static String email;
+    private static String password;
     private String nameC;
     private String emailC;
     private String passwordC;
-    private String Token;
+    private String TokenA;
+    private String token;
     private String refreshToken;
     private final Gson gson = new Gson();
+    private static final Faker faker = new Faker();
+
+    static {
+        Faker faker = new Faker();
+        name = faker.name().username();
+        email = faker.internet().emailAddress();
+        password = faker.internet().password();
+    }
 
     public ChangeInformationUserNoAuthorizationeTest (String nameC, String emailC, String passwordC) {
         this.nameC = nameC;
@@ -38,9 +50,10 @@ public class ChangeInformationUserNoAuthorizationeTest {
         User user = new User(name, email, password);
         CreateUserApi createUserApi = new CreateUserApi();
         Response response = createUserApi.createUser(user);
-        Token = response.jsonPath().get("accessToken");
+        TokenA = response.jsonPath().get("accessToken");
         refreshToken = response.jsonPath().get("refreshToken");
 
+        LogoutRequest logoutRequest = new LogoutRequest(token);
         ChangeInformationUser changeInformationUser = new ChangeInformationUser();
         Response responseSecond = changeInformationUser.leavingSystem(refreshToken);
         responseSecond.then().statusCode(200);
@@ -49,20 +62,25 @@ public class ChangeInformationUserNoAuthorizationeTest {
     @After
     @Step("Удаление созданного пользователя")
     public void tearDown() {
-        if (Token != null) {
+        if (TokenA != null) {
             CreateUserApi createUserApi = new CreateUserApi();
-            Response response = createUserApi.deleteUser(Token);
+            Response response = createUserApi.deleteUser(TokenA);
             response.then().statusCode(202);
         }
     }
 
     @Parameterized.Parameters(name = "Имя: {0}, Почта: {1}, Пароль: {2}")
     public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][]{
-                {"Useeeername", "testaa-data@yandex.ru", "passwordaa"},
-                {"Usernameaa", "teeeesttaa-data@yandex.ru", "passwordaa"},
-                {"Usernameaa", "testaa-data@yandex.ru", "paaaaasswoorda"},
-        });
+        List<Object[]> data = new ArrayList<>();
+
+        for (int i = 0; i < 3; i++) {
+            String randomName = faker.name().username();
+            String randomEmail = faker.internet().emailAddress();
+            String randomPassword = faker.internet().password();
+            data.add(new Object[]{randomName, randomEmail, randomPassword});
+        }
+
+        return data;
     }
 
     @Test

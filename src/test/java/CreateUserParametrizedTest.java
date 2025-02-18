@@ -1,3 +1,4 @@
+import com.github.javafaker.Faker;
 import com.google.gson.Gson;
 import io.qameta.allure.Description;
 import io.qameta.allure.Step;
@@ -14,6 +15,7 @@ import org.junit.runners.Parameterized;
 import java.util.Arrays;
 import java.util.Collection;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 
 @RunWith(Parameterized.class)
@@ -22,6 +24,7 @@ public class CreateUserParametrizedTest {
     private String name;
     private String password;
     private final Gson gson = new Gson();
+    private static Faker faker;
 
     public CreateUserParametrizedTest (String name, String email, String password) {
         this.name = name;
@@ -32,10 +35,11 @@ public class CreateUserParametrizedTest {
 
     @Parameterized.Parameters(name = "Имя: {0}, Почта: {1}, Пароль: {2}")
     public static Collection<Object[]> data() {
+        faker = new Faker();
         return Arrays.asList(new Object[][]{
-                {"", "testaa-data@yandex.ru", "passwordaa"},
-                {"Usernameaa", "", "passwordaa"},
-                {"Usernameaa", "testaa-data@yandex.ru", ""},
+                {"", faker.internet().emailAddress(), faker.internet().password()},
+                {faker.name().fullName(), "", faker.internet().password()},
+                {faker.name().fullName(), faker.internet().emailAddress(), ""},
         });
     }
 
@@ -48,6 +52,7 @@ public class CreateUserParametrizedTest {
         Response response = createUserApi.createUser(user);
         response.then().statusCode(403);
         response.then().body("success", equalTo(false));
+        response.then().body("message", equalTo("Email, password and name are required fields"));
     }
 
 }
