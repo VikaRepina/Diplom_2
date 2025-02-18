@@ -1,0 +1,58 @@
+import com.github.javafaker.Faker;
+import com.google.gson.Gson;
+import io.qameta.allure.Description;
+import io.qameta.allure.Step;
+import io.qameta.allure.junit4.DisplayName;
+import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
+import io.restassured.response.Response;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+
+import java.util.Arrays;
+import java.util.Collection;
+
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.equalTo;
+
+@RunWith(Parameterized.class)
+public class CreateUserParametrizedTest {
+    private String email;
+    private String name;
+    private String password;
+    private final Gson gson = new Gson();
+    private static Faker faker;
+
+    public CreateUserParametrizedTest (String name, String email, String password) {
+        this.name = name;
+        this.email = email;
+        this.password = password;
+    }
+
+
+    @Parameterized.Parameters(name = "Имя: {0}, Почта: {1}, Пароль: {2}")
+    public static Collection<Object[]> data() {
+        faker = new Faker();
+        return Arrays.asList(new Object[][]{
+                {"", faker.internet().emailAddress(), faker.internet().password()},
+                {faker.name().fullName(), "", faker.internet().password()},
+                {faker.name().fullName(), faker.internet().emailAddress(), ""},
+        });
+    }
+
+    @Test
+    @DisplayName("Test courier with missing field")
+    @Description("Проверка на вывод ошибки, при создание пользователя без обязательного поля")
+    public void testCourierWithMissingField() {
+        User user = new User(name, email, password);
+        CreateUserApi createUserApi = new CreateUserApi();
+        Response response = createUserApi.createUser(user);
+        response.then().statusCode(403);
+        response.then().body("success", equalTo(false));
+        response.then().body("message", equalTo("Email, password and name are required fields"));
+    }
+
+}
